@@ -67,7 +67,7 @@ def categorize_all():
             # accuracy
             cats[cat]["drecall"] = res[1]/res[3]
             cats[cat]["crecall"] = res[2]/res[3]
-        # add to golbal counts
+        # add to global counts
         total += res[3]
         cos_correct += res[1]
         oop_correct += res[2]
@@ -180,14 +180,13 @@ def categorize(text):
     cosine_min = sys.maxint
     out_of_place_estimate = "NO CATEGORY"
     out_of_place_min = sys.maxint
-    #print "Beginning Catigorizations For " + text
     for category in CATAGORIES:
-        # only use ngrams of length 5 for cosine measure
-        # cos_counts = { i: j for i, j in ccounts.iteritems() if len(i) == 5 }
+        # use Damashek Dictionary for Cosine Measure
         tcos = cosine_measure(DDICT[category], dcounts)
         if tcos < cosine_min:
             cosine_estimate = category
             cosine_min = tcos
+        # use Cavnar Dictionary for Out of Place Measure
         tout = out_of_place_measure(CDICT[category], ccounts)
         if tout < out_of_place_min:
             out_of_place_estimate = category
@@ -218,11 +217,11 @@ def cosine_measure(template, sample):
     return cosine_dist(tfreqs, sfreqs)
 
 def cosine_dist(vect1, vect2):
-    mu1 = 1/len(vect1)# * sum(vect1)
-    mu2 = 1/len(vect2)# * sum(vect2)
-    numerator = 0 #sum(x * x - mu1 for x in vect1)
-    sumsqr1 = 0 #sum(x * x - mu2 for x in vect2)
-    sumsqr2 = 0 #sum((x - mu1) * (y - mu2) for x in vect1 for y in vect2)
+    mu1 = 1/len(vect1)
+    mu2 = 1/len(vect2)
+    numerator = 0 
+    sumsqr1 = 0
+    sumsqr2 = 0
     for i in xrange(0, len(vect1)):
         x = vect1[i]; y = vect2[i]
         numerator += (x) * (y) 
@@ -245,7 +244,6 @@ def out_of_place_measure(template, sample):
             index = keyindex[svector[i][0]]
             dist += abs(index - i)
         else:
-            # TODO: What if ngram is not present in svector
             dist += abs(len(tvector))
     return dist
 
@@ -253,6 +251,7 @@ def opendict():
     global DDICT, CDICT
     DDICT = pickle.load(open('ddict.pk1', 'rb'))
     CDICT = pickle.load(open('cdict.pk1', 'rb'))
+
 def generate():
     global CDICT, DDICT
     for category in CATAGORIES:
